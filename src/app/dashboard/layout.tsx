@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { Activity, Bell, LayoutDashboard, Settings, Map, LogOut } from "lucide-react";
+import { Activity, Bell, LayoutDashboard, Settings, Map, LogOut, Mail, Code, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AIChatbot } from "@/features/chat/frontend/AIChatbot";
 
@@ -62,6 +62,25 @@ export default async function DashboardLayout({
             </Button>
           </Link>
         </nav>
+
+        {/* Developer Contact Section */}
+        <div className="p-4 mx-4 mb-4 rounded-xl bg-primary/10 border border-primary/20">
+          <p className="text-xs font-semibold text-primary mb-3 uppercase tracking-wider">Developer</p>
+          <div className="space-y-2">
+            <a href="mailto:daksh@example.com" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Mail className="h-4 w-4 mr-2" />
+              daksh@example.com
+            </a>
+            <a href="https://github.com/DAKSH1124" target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Code className="h-4 w-4 mr-2" />
+              @DAKSH1124
+            </a>
+            <a href="https://linkedin.com/in/daksh" target="_blank" rel="noopener noreferrer" className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
+              <Briefcase className="h-4 w-4 mr-2" />
+              LinkedIn
+            </a>
+          </div>
+        </div>
 
         {/* User Profile / Logout */}
         <div className="p-4 border-t border-border/40">
