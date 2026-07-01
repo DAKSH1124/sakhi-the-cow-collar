@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Activity, Bell, LayoutDashboard, Settings, Map, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AIChatbot } from "@/components/dashboard/AIChatbot";
 
 export default async function DashboardLayout({
   children,
@@ -96,9 +97,12 @@ export default async function DashboardLayout({
           </Link>
         </div>
         
-        <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-background">
+        <div className="flex-1 overflow-y-auto p-4 md:p-8 bg-background relative">
           {children}
         </div>
+        
+        {/* Floating AI Chatbot Widget */}
+        <AIChatbot />
       </main>
     </div>
   );
