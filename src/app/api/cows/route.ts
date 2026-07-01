@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "./../auth/[...nextauth]/route";
-
-const prisma = new PrismaClient();
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { getCowsForUser, createCow } from "@/features/cattle/backend/cattleService";
 
 export async function GET() {
   try {
@@ -13,33 +11,7 @@ export async function GET() {
     }
 
     const userId = (session.user as any).id;
-
-    const cows = await prisma.cow.findMany({
-      where: { userId },
-      include: {
-        sensorData: {
-          orderBy: { timestamp: "desc" },
-          take: 1, // Get the latest sensor reading for each cow
-        }
-      }
-    });
-
-    // Format data for the frontend
-    const formattedCows = cows.map(cow => {
-      const latestData = cow.sensorData[0] || { pulse: 0, temperature: 0, lat: null, lng: null };
-      return {
-        id: cow.collarId,
-        name: cow.name,
-        breed: cow.breed,
-        age: `${cow.age} yrs`,
-        weight: `${cow.weight} kg`,
-        pulse: latestData.pulse,
-        temp: latestData.temperature,
-        lat: latestData.lat,
-        lng: latestData.lng,
-        status: cow.status,
-      };
-    });
+    const formattedCows = await getCowsForUser(userId);
 
     return NextResponse.json(formattedCows);
   } catch (error) {
@@ -58,16 +30,7 @@ export async function POST(req: Request) {
     const userId = (session.user as any).id;
     const data = await req.json();
     
-    const newCow = await prisma.cow.create({
-      data: {
-        collarId: data.collarId,
-        name: data.name || null,
-        breed: data.breed,
-        age: parseInt(data.age),
-        weight: parseFloat(data.weight),
-        userId: userId,
-      }
-    });
+    const newCow = await createCow(userId, data);
 
     return NextResponse.json(newCow, { status: 201 });
   } catch (error) {

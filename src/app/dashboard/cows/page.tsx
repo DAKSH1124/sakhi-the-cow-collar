@@ -86,11 +86,9 @@ export default function CowsPage() {
         <h1 className="text-3xl font-bold tracking-tight">Cattle Management</h1>
         
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
+            <Button className="flex items-center gap-2" onClick={() => setOpen(true)}>
               <Plus className="h-4 w-4" /> Add Cow
             </Button>
-          </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle>Register New Cow</DialogTitle>

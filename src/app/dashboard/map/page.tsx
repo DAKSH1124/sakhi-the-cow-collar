@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 
 // Dynamically import the map component with SSR disabled
-const CowMap = dynamic(() => import("@/components/dashboard/CowMap"), {
+const CowMap = dynamic(() => import("@/features/cattle/frontend/CowMap"), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full rounded-xl" />,
 });

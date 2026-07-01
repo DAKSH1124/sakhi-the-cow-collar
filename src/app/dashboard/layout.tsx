@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Activity, Bell, LayoutDashboard, Settings, Map, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { AIChatbot } from "@/components/dashboard/AIChatbot";
+import { AIChatbot } from "@/features/chat/frontend/AIChatbot";
 
 export default async function DashboardLayout({
   children,
