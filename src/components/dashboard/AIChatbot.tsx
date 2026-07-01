@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useChat } from "@ai-sdk/react";
+// Removed useChat
 import { Bot, X, Send, User, Loader2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,12 +14,50 @@ export function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   
-  const { messages, input, handleInputChange, handleSubmit, isLoading, error } = useChat({
-    api: "/api/chat",
-    onError: (err) => {
+  const [messages, setMessages] = useState<{id: string, role: string, content: string}[]>([]);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value);
+
+  const append = async (message: { role: string, content: string }) => {
+    const newMessage = { id: Date.now().toString(), ...message };
+    const newMessages = [...messages, newMessage];
+    setMessages(newMessages);
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: newMessages })
+      });
+      
+      if (!response.ok) throw new Error("Failed to fetch");
+      const reader = response.body?.getReader();
+      if (!reader) return;
+      
+      const decoder = new TextDecoder();
+      let assistantMessage = "";
+      const assistantId = (Date.now() + 1).toString();
+      
+      setMessages([...newMessages, { id: assistantId, role: "assistant", content: "" }]);
+      
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        assistantMessage += decoder.decode(value, { stream: true });
+        setMessages([...newMessages, { id: assistantId, role: "assistant", content: assistantMessage }]);
+      }
+    } catch (err: any) {
       toast.error("Failed to connect to AI Assistant.");
+      setError(err);
+    } finally {
+      setIsLoading(false);
     }
-  });
+  };
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -108,14 +146,19 @@ export function AIChatbot() {
         </CardContent>
         
         <CardFooter className="p-3 border-t bg-background">
-          <form onSubmit={handleSubmit} className="flex w-full items-center gap-2">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (!input || input.trim() === "") return;
+            append({ role: "user", content: input });
+            setInput(""); // Clear input
+          }} className="flex w-full items-center gap-2">
             <Input
               value={input}
               onChange={handleInputChange}
               placeholder="Ask a question..."
               className="flex-1"
             />
-            <Button type="submit" size="icon" disabled={isLoading || !input || input.trim().length === 0}>
+            <Button type="submit" size="icon">
               {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
             </Button>
           </form>
